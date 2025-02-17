@@ -1,13 +1,3 @@
-// const opentelemetry = require('@opentelemetry/sdk-node')
-// const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node')
-// const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc');
-
-// const sdk = new opentelemetry.NodeSDK({
-//   traceExporter: new OTLPTraceExporter({ url: 'http://otel-collector:4317' }),
-//   instrumentations: [getNodeAutoInstrumentations()],
-// })
-// sdk.start()
-
 /*instrumentation.js*/
 const { NodeSDK } = require('@opentelemetry/sdk-node');
 const {
@@ -25,14 +15,17 @@ const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc')
 const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node')
 
 const sdk = new NodeSDK({
+  // Define the server and version for tracer clarity. 
   resource: new Resource({
     [ATTR_SERVICE_NAME]: 'dice-server',
     [ATTR_SERVICE_VERSION]: '0.1.0',
   }),
   traceExporter: new OTLPTraceExporter({ url: 'http://otel-collector:4317' }),
+  // Below code will output to console, but this would be used to collect metrics with prometheus
   metricReader: new PeriodicExportingMetricReader({
     exporter: new ConsoleMetricExporter(),
   }),
+  // https://opentelemetry.io/docs/languages/js/libraries/#registration
   instrumentations: [getNodeAutoInstrumentations()],
 });
 

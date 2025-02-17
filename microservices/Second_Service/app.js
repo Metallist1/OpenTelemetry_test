@@ -2,26 +2,25 @@
 const { trace, SpanStatusCode } = require('@opentelemetry/api');
 const express = require('express');
 const { rollTheDice } = require('./dice.js');
-
-const tracer = trace.getTracer('example-server', '0.1.1');
-
 const PORT = parseInt(process.env.PORT || '8081');
 const app = express();
 
+const tracer = trace.getTracer('example-server', '0.1.1');
+
+// Use http://localhost:8081/rolldice?rolls=12
 app.get('/rolldice', (req, res) => {
   // Nested Span example
   const rolls = req.query.rolls ? parseInt(req.query.rolls.toString()) : NaN;
   if (isNaN(rolls)) {
-    res
-      .status(400)
-      .send("Request parameter 'rolls' is missing or not a number.");
+    res.status(400).send("Request parameter 'rolls' is missing or not a number.");
     return;
   }
   res.send(JSON.stringify(rollTheDice(rolls, 1, 6)));
 });
 
+//http://localhost:8081/sibling
 app.get('/sibling', (req, res) => {
-  //Casually related span example
+  // Create independent spans
   // Span event
   const span1 = tracer.startSpan('work-1');
   span1.addEvent('Doing something');
@@ -44,14 +43,14 @@ app.get('/sibling', (req, res) => {
   span1.end();
   span2.end();
   span3.end();
-
   res.send("Done");
 });
 
-
+//http://localhost:8081/exception
 app.get('/exception', (req, res) => {
   //Span recording exception example
   const span = tracer.startSpan('throw-exception');
+
   try {
     null.toString();
   } catch (ex) {
@@ -60,8 +59,8 @@ app.get('/exception', (req, res) => {
     }
     span.setStatus({ code: SpanStatusCode.ERROR });
   }
-  span.end();
 
+  span.end();
   res.send("Thrown exception");
 });
 
