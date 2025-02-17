@@ -17,11 +17,14 @@ const consume = function consume({ connection, channel, resultsChannel }) {
 
           try {
             const json = JSON.parse(msgBody);
+            //Get current active context 
             let activeContext = context.active();
             if (json._meta) {
+              //Extract context from message
               activeContext = propagation.extract(context.active(), json._meta);
               delete json._meta;
             }
+            //Set span to record events/attributes/path to parent tracer
             span = tracer.startSpan('receive', { kind: 1 }, activeContext);
             trace.setSpan(activeContext, span);
 
@@ -29,9 +32,10 @@ const consume = function consume({ connection, channel, resultsChannel }) {
           } catch (e) {
             console.error('Error parsing JSON:', e.message);
           } finally {
+            // Do not forget to close span.
             span.end();
           }
-          
+
         await channel.ack(msg);
       });
 
