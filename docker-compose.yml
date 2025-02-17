@@ -33,7 +33,7 @@ services:
       - "--config"
       - "/otel-local-config.yaml"
     volumes:
-      - ./Devops/otel/otel-collector.yaml:/otel-local-config.yaml
+      - ./devops/otel/otel-collector.yaml:/otel-local-config.yaml
     depends_on:
       - tempo
       
@@ -41,8 +41,8 @@ services:
     image: grafana/tempo:latest
     command: ["-config.file=/etc/tempo.yaml"]
     volumes:
-      - ./Devops/tempo/tempo.yaml:/etc/tempo.yaml
-      - ./Devops/tempo/tempo-data:/tmp/tempo
+      - ./devops/tempo/tempo.yaml:/etc/tempo.yaml
+      - ./devops/tempo/tempo-data:/tmp/tempo
     ports:
       - "3200:3200" # tempo http
       - "9095:9095" # tempo grpc
@@ -52,7 +52,7 @@ services:
   grafanaa:
     image: grafana/grafana:9.4.3
     volumes:
-      - ./Devops/grafana/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./devops/grafana/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
