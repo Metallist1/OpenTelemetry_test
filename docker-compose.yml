@@ -104,6 +104,7 @@ services:
     build:
       context: microservices/RabbitMQ_Reciever
       dockerfile: ./Dockerfile
+    restart: always
     depends_on:
       - rabbitmq
       - grafanaa
